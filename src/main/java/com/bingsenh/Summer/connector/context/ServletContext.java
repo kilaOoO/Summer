@@ -99,6 +99,7 @@ public class ServletContext {
     private void parseXml(){
         SAXReader reader = new SAXReader();
         Document doc = null;
+
         try {
             doc = reader.read(ServletContext.class.getResourceAsStream("web.xml"));
         } catch (DocumentException e) {

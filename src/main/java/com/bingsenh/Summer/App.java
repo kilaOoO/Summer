@@ -1,6 +1,10 @@
 package com.bingsenh.Summer;
 
+import com.bingsenh.Summer.connector.context.ServletContext;
 import com.bingsenh.Summer.network.BioEndPoint;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
 
 import java.util.Scanner;
 
@@ -23,5 +27,18 @@ public class App
                 System.exit(0);
             }
         }
+//
+//        System.out.println(App.class.getResource(""));
+//        System.out.println(App.class.getResource("/"));
+
+//        SAXReader reader = new SAXReader();
+//        Document doc = null;
+//
+//        try {
+//            doc = reader.read(App.class.getResourceAsStream("/web.xml"));
+//        } catch (DocumentException e) {
+//            System.out.println("加载失败");
+//            e.printStackTrace();
+//        }
     }
 }

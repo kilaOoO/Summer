@@ -35,7 +35,7 @@ public class Request {
         }
 
         if(messages ==null||messages.length<=1){
-            throw new ServletException();
+            return;
         }
 
         parseHeaders(messages);

@@ -5,11 +5,13 @@ import com.bingsenh.Summer.connector.Response.Response;
 import com.bingsenh.Summer.connector.context.ServletContext;
 import com.bingsenh.Summer.exception.ServletException;
 import com.bingsenh.Summer.servlet.Servlet;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Author hbs
  * @Date 2019/6/1
  */
+@Slf4j
 public abstract class AbstractRequestHandler implements Runnable{
     protected Request request;
     protected Response response;
@@ -29,14 +31,18 @@ public abstract class AbstractRequestHandler implements Runnable{
 
     }
 
-    public void run(){
+    @Override
+    public void run() {
+        //service();
         service();
+
     }
 
-
     private  void service(){
+        log.info("线程执行");
         servlet.service(request,response);
         if(!isFinished){
+            log.info("写回客户端");
             flushResponse();
         }
     }

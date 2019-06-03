@@ -2,6 +2,7 @@ package sample;
 
 import com.bingsenh.Summer.connector.Request.Request;
 import com.bingsenh.Summer.connector.Response.Response;
+import com.bingsenh.Summer.connector.enumeration.HttpStatus;
 import com.bingsenh.Summer.servlet.HttpServlet;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,13 +25,24 @@ public class LoginServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(Request request, Response response) {
+    public void doGet(Request request, Response response) {
         Map<String,String> params = request.getParams();
         String username = params.get("username");
         String password = params.get("password");
         System.out.println(username);
         System.out.println(password);
-        String message = "Hello world";
+        String message = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head>\n" +
+                "<meta charset=\"utf-8\">\n" +
+                "<title>菜鸟教程(runoob.com)</title>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "    <p>hello</p>\n" +
+                "</body>\n" +
+                "</html>";
+
+        response.setStatus(HttpStatus.OK);
         response.setBody(message.getBytes());
     }
 }
