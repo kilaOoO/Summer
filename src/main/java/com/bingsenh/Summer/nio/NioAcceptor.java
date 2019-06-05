@@ -27,7 +27,7 @@ public class NioAcceptor implements Runnable {
         coreNum = Runtime.getRuntime().availableProcessors();
         pollers = new NioPoller[coreNum];
         for(int i =0;i<pollers.length;i++){
-            pollers[i] = new NioPoller();
+            pollers[i] = new NioPoller(i);
         }
     }
     @Override
@@ -58,7 +58,8 @@ public class NioAcceptor implements Runnable {
                         socketChannel.configureBlocking(false);
                         log.info("Accept request from {}",socketChannel.getRemoteAddress());
                         NioPoller poller = pollers[(int)(index++) % coreNum];
-                        //readKey.attach()
+                        poller.addChannel(socketChannel);
+                        poller.wakeup();
                     }
                 }
 

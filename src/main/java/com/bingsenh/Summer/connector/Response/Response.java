@@ -76,6 +76,11 @@ public class Response {
     }
 
 
+    public void flushResponse(){
+
+    }
+
+
 
 
 

@@ -22,9 +22,19 @@ public class NioPoller {
     private static final ExecutorService service =
             Executors.newFixedThreadPool(2 * Runtime.getRuntime().availableProcessors());
     private Selector selector;
-    public NioPoller() throws IOException {
+
+    private int pollerNo;
+
+
+    public NioPoller(int pollerno) throws IOException {
+        this.pollerNo = pollerno;
         this.selector = SelectorProvider.provider().openSelector();
         start();
+    }
+
+
+    public int getPollerno(){
+        return pollerNo;
     }
 
     public void addChannel(SocketChannel socketChannel) throws ClosedChannelException {
@@ -52,6 +62,7 @@ public class NioPoller {
                     keys.remove(key);
                     if(key.isReadable()){
                         SocketChannel socketChannel = (SocketChannel) key.channel();
+
                     }else if(key.isWritable()){
 
                     }
