@@ -39,15 +39,18 @@ public class TCPHandler {
     }
 
     private void readHandle() throws IOException {
-        byte[] arr = new byte[1024];
-        ByteBuffer buf = ByteBuffer.wrap(arr);
-        int numBytes = sc.read(buf);
-        if(numBytes == -1){
+        //byte[] arr = new byte[1024];
+        //ByteBuffer buf = ByteBuffer.wrap(arr);
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        int read = sc.read(buffer);
+        //int numBytes = sc.read(buf);
+        if(read<=0){
             closeChannel();
         }else {
+            byte[] arr = buffer.array();
             String str = new String(arr);
-            System.out.println(str);
-            pool.execute(new Worker(sk,buf));
+            System.out.println("客服端消息为："+str);
+            pool.execute(new Worker(sk,buffer));
         }
     }
 

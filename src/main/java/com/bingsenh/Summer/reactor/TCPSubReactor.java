@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -29,15 +30,22 @@ public class TCPSubReactor implements Runnable {
         log.info("the sub is running");
         while(!Thread.interrupted() && !restart){
             try {
-                if(selector.select() <= 0){
+                if(selector.selectNow() <= 0){
+                    Thread.sleep(3000);
+                    //log.info("continue");
                     continue;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             log.info("coming.....");
             Set<SelectionKey> keys = selector.selectedKeys();
-            for(SelectionKey key:keys){
+            Iterator<SelectionKey> iterator = keys.iterator();
+            while(iterator.hasNext()){
+                SelectionKey key = iterator.next();
+                iterator.remove();
                 TCPHandler handler = (TCPHandler) key.attachment();
                 try {
                     handler.dispatch();

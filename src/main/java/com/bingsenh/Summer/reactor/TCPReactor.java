@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -30,9 +31,9 @@ public class TCPReactor extends Thread {
     @Override
     public void run() {
         while(!Thread.interrupted()){
-            log.info("mainReactor waiting for new connection....");
+            //log.info("mainReactor waiting for new connection....");
             try {
-                if(selector.select() <= 0){
+                if(selector.selectNow() <= 0){
                     continue;
                 }
             } catch (IOException e) {
@@ -40,7 +41,10 @@ public class TCPReactor extends Thread {
             }
 
             Set<SelectionKey> keys = selector.selectedKeys();
-            for(SelectionKey key:keys){
+            Iterator<SelectionKey> iterator = keys.iterator();
+            while (iterator.hasNext()){
+                SelectionKey key = iterator.next();
+                iterator.remove();
                 Accepter accepter = (Accepter) key.attachment();
                 try {
                     accepter.dispatch();
