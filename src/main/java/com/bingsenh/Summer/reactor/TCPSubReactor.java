@@ -27,29 +27,28 @@ public class TCPSubReactor implements Runnable {
     }
     @Override
     public void run() {
-        log.info("the sub is running");
-        while(!Thread.interrupted() && !restart){
-            try {
-                if(selector.select()==0){
-                    log.info("come");
-                    continue;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            //log.info("coming.....");
-            Set<SelectionKey> keys = selector.selectedKeys();
-            //log.info(keys.size()+"");
-            Iterator<SelectionKey> iterator = keys.iterator();
-            while(iterator.hasNext()){
-                SelectionKey key = iterator.next();
-                TCPHandler handler = (TCPHandler) key.attachment();
+        log.info("the subReactor is running");
+        while (!Thread.interrupted()) {
+            while (!Thread.interrupted() && !restart) {
                 try {
-                    handler.dispatch();
+                    if (selector.select() <= 0) {
+                        continue;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                iterator.remove();
+                Set<SelectionKey> keys = selector.selectedKeys();
+                Iterator<SelectionKey> iterator = keys.iterator();
+                while (iterator.hasNext()) {
+                    SelectionKey key = iterator.next();
+                    iterator.remove();
+                    TCPHandler handler = (TCPHandler) key.attachment();
+                    try {
+                        handler.dispatch();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }

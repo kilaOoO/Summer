@@ -32,20 +32,22 @@ public class TCPHandler {
     public void dispatch() throws IOException {
         //log.info("handle the request");
         if(sk.isReadable()){
+            System.out.println("read.....");
             readHandle();
         }else if(sk.isWritable()){
+            System.out.println("write....");
             writeHandle();
+        }else {
+            System.out.println("other");
         }
     }
 
     private void readHandle() throws IOException {
-        //byte[] arr = new byte[1024];
-        //ByteBuffer buf = ByteBuffer.wrap(arr);
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         int read = sc.read(buffer);
-        //int numBytes = sc.read(buf);
         if(read<=0){
             closeChannel();
+            System.out.println("no");
         }else {
             byte[] arr = buffer.array();
             String str = new String(arr);
@@ -62,8 +64,8 @@ public class TCPHandler {
         }
 
         //长连接需要更改为read状态
-        //sk.interestOps(SelectionKey.OP_WRITE);
-        //sk.selector().wakeup();
+        sk.interestOps(SelectionKey.OP_READ);
+        sk.selector().wakeup();
     }
 
 

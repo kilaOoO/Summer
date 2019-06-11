@@ -31,9 +31,9 @@ public class TCPReactor extends Thread {
     @Override
     public void run() {
         while(!Thread.interrupted()){
-            //log.info("mainReactor waiting for new connection....");
+            log.info("mainReactor waiting for new connection....");
             try {
-                if(selector.selectNow() <= 0){
+                if(selector.select() <= 0){
                     continue;
                 }
             } catch (IOException e) {

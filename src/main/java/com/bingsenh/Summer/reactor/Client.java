@@ -21,6 +21,7 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         while(true) {
             Scanner scanner = new Scanner(System.in);
             if (scanner.hasNext()) {
