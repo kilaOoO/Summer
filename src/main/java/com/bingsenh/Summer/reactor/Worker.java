@@ -16,7 +16,7 @@ public class Worker implements Runnable {
     }
     @Override
     public void run() {
-        System.out.println("do something");
+        System.out.println(Thread.currentThread().getName()+"do something");
         this.sk.interestOps(SelectionKey.OP_WRITE);
         this.sk.selector().wakeup();
 

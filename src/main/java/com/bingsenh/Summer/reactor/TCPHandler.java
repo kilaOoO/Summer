@@ -30,7 +30,7 @@ public class TCPHandler {
     }
 
     public void dispatch() throws IOException {
-        log.info("handle the request");
+        //log.info("handle the request");
         if(sk.isReadable()){
             readHandle();
         }else if(sk.isWritable()){
@@ -68,12 +68,12 @@ public class TCPHandler {
 
 
     public void closeChannel(){
-        sk.cancel();
         try {
             sc.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        sk.cancel();
     }
 
 

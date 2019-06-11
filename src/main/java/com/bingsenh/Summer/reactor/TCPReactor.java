@@ -44,13 +44,13 @@ public class TCPReactor extends Thread {
             Iterator<SelectionKey> iterator = keys.iterator();
             while (iterator.hasNext()){
                 SelectionKey key = iterator.next();
-                iterator.remove();
                 Accepter accepter = (Accepter) key.attachment();
                 try {
                     accepter.dispatch();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                iterator.remove();
             }
         }
     }
