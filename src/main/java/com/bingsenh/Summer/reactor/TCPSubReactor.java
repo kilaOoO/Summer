@@ -27,7 +27,7 @@ public class TCPSubReactor implements Runnable {
     }
     @Override
     public void run() {
-        log.info("the subReactor is running");
+        log.info("the subReactor is running.....");
         while (!Thread.interrupted()) {
             while (!Thread.interrupted() && !restart) {
                 try {

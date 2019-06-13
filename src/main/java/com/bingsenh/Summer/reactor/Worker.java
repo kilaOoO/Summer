@@ -1,5 +1,8 @@
 package com.bingsenh.Summer.reactor;
 
+import com.bingsenh.Summer.connector.context.ServletContext;
+import com.bingsenh.Summer.connector.context.WebApplication;
+
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 
@@ -10,7 +13,9 @@ import java.nio.channels.SelectionKey;
 public class Worker implements Runnable {
     private SelectionKey sk;
     private ByteBuffer byteBuffer;
+    private ServletContext servletContext;
     public Worker(SelectionKey sk,ByteBuffer byteBuffer){
+        this.servletContext = WebApplication.getServletContext();
         this.sk = sk;
         this.byteBuffer = byteBuffer;
     }

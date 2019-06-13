@@ -57,11 +57,15 @@ public class Response {
         headerAppender.append("Content-Length:").append(BLANK).append(body.length).append(CRLF).append(CRLF);
     }
 
-    public ByteBuffer[] getResponse(){
+    public ByteBuffer getResponse(){
         buildHeader();
+//        byte[] header = this.headerAppender.toString().getBytes(UTF_8_CHARSET);
+//        ByteBuffer[] response = {ByteBuffer.wrap(header),ByteBuffer.wrap(body)};
         byte[] header = this.headerAppender.toString().getBytes(UTF_8_CHARSET);
-        ByteBuffer[] response = {ByteBuffer.wrap(header),ByteBuffer.wrap(body)};
-        return response;
+        byte[] response = new byte[header.length + body.length];
+        System.arraycopy(header, 0, response, 0, header.length);
+        System.arraycopy(body, 0, response, header.length, body.length);
+        return ByteBuffer.wrap(response);
     }
 
     public byte[] getResponseBytes(){
