@@ -1,6 +1,6 @@
 package com.bingsenh.Summer.nio;
 
-import com.bingsenh.Summer.reactor.Worker;
+import com.bingsenh.Summer.connector.Response.Response;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class Processor {
     private SelectionKey sk;
     private SocketChannel sc;
+    private SocketWrapper socketWrapper;
     private static final int THREAD_NUM = 10;
     private static ThreadPoolExecutor pool = new ThreadPoolExecutor(
             THREAD_NUM,THREAD_NUM,
@@ -24,10 +25,17 @@ public class Processor {
             new LinkedBlockingDeque<Runnable>()
     );
 
-    public Processor(SelectionKey sk){
+    public Processor(SocketWrapper socketWrapper){
+            this.socketWrapper =socketWrapper;
+            this.sk = socketWrapper.getSk();
             this.sk = sk;
             this.sc = (SocketChannel) sk.channel();
             pool.setCorePoolSize(32);
+    }
+
+
+    public SocketWrapper getSocketWrapper(){
+        return socketWrapper;
     }
 
     public void dispatch() throws IOException {
@@ -47,12 +55,24 @@ public class Processor {
             closeChannel();
             System.out.println("read is null...");
         }else {
-            pool.execute(new Worker(sk,buffer));
+            pool.execute(new Worker(socketWrapper,buffer));
         }
     }
 
-    private void writeHandle(){
+    private void writeHandle() throws IOException {
+        Response response = socketWrapper.getResponse();
+        if(response == null){
+            System.out.println("response is null");
+        }
+        ByteBuffer ResponseBuffer = response.getResponse();
+        while(ResponseBuffer.hasRemaining()){
+            sc.write(ResponseBuffer);
+        }
 
+        //长连接需要更改为read状态
+        socketWrapper.setResponse(null);
+        this.sk.interestOps(SelectionKey.OP_READ);
+        this.sk.selector().wakeup();
     }
 
     private void closeChannel(){

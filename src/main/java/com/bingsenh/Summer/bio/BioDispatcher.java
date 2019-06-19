@@ -1,15 +1,13 @@
-package com.bingsenh.Summer.network;
+package com.bingsenh.Summer.bio;
 
 import com.bingsenh.Summer.connector.Request.Request;
 import com.bingsenh.Summer.connector.Response.Response;
-import com.bingsenh.Summer.connector.context.ServletContext;
 import com.bingsenh.Summer.exception.ServletException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @Author hbs

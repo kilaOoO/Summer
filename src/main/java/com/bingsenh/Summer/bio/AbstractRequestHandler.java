@@ -1,4 +1,4 @@
-package com.bingsenh.Summer.network;
+package com.bingsenh.Summer.bio;
 
 import com.bingsenh.Summer.connector.Request.Request;
 import com.bingsenh.Summer.connector.Response.Response;

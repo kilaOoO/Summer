@@ -1,11 +1,8 @@
 package com.bingsenh.Summer;
 
-import com.bingsenh.Summer.connector.context.ServletContext;
-import com.bingsenh.Summer.network.BioEndPoint;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.io.SAXReader;
+import com.bingsenh.Summer.nio.HttpServer;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -16,15 +13,22 @@ public class App
 {
     public static void main( String[] args )
     {
-        BioEndPoint server = new BioEndPoint();
-        server.start(1234);
+//        BioEndPoint server = new BioEndPoint();
+//        server.start(1234);
+        HttpServer httpServer = null;
+        try {
+            httpServer = new HttpServer(1234);
+            httpServer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Scanner scanner = new Scanner(System.in);
         String order;
         while(scanner.hasNext()){
             order = scanner.next();
             if(order.equals("exit")){
-                server.close();
                 System.exit(0);
+                httpServer.closeServer();
             }
         }
 //

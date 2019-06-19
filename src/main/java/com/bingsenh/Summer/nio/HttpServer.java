@@ -15,7 +15,7 @@ import java.util.Set;
  * @Date 2019/6/11
  */
 @Slf4j
-public class HttpServer implements Runnable{
+public class HttpServer extends Thread{
     private ServerSocketChannel ssc;
     private Selector selector;
 
@@ -26,6 +26,15 @@ public class HttpServer implements Runnable{
         ssc.configureBlocking(false);
         SelectionKey sk = ssc.register(selector,SelectionKey.OP_ACCEPT);
         sk.attach(new Accepter(ssc));
+    }
+
+    public void closeServer(){
+        try {
+            selector.close();
+            ssc.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void run(){

@@ -22,8 +22,10 @@ public class Worker implements Runnable{
     private Request request;
     private Servlet servlet;
     private ServletContext servletContext;
-    public Worker(SelectionKey sk, ByteBuffer byteBuffer){
-        this.sk = sk;
+    private SocketWrapper socketWrapper;
+    public Worker(SocketWrapper socketWrapper, ByteBuffer byteBuffer){
+        this.socketWrapper = socketWrapper;
+        this.sk = socketWrapper.getSk();
         this.byteBuffer = byteBuffer;
         this.servletContext = WebApplication.getServletContext();
     }
@@ -31,11 +33,16 @@ public class Worker implements Runnable{
     @Override
     public void run() {
         try {
+            //构建request && response
             request = new Request(byteBuffer.array());
             response = new Response();
             servlet = servletContext.mapServlet(request.getUrl());
+            //执行业务逻辑
             service();
-            ByteBuffer ResponseBuffer = response.getResponse();
+            socketWrapper.setResponse(response);
+            this.sk.interestOps(SelectionKey.OP_WRITE);
+            this.sk.selector().wakeup();
+
 
         } catch (ServletException e) {
             e.printStackTrace();

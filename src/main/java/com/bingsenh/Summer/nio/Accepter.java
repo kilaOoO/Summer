@@ -39,7 +39,8 @@ public class Accepter {
             r[coreId].setRestart(true);
             selectors[coreId].wakeup();
             SelectionKey sk = sc.register(selectors[coreId],SelectionKey.OP_READ);
-            sk.attach(new Processor(sk));
+            SocketWrapper socketWrapper = new SocketWrapper(sk);
+            sk.attach(new Processor(socketWrapper));
             selectors[coreId].wakeup();
             r[coreId].setRestart(false);
             if(++coreId == selectors.length){
