@@ -1,4 +1,4 @@
-package com.bingsenh.Summer.Cookie;
+package com.bingsenh.Summer.cookie;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package com.bingsenh.Summer.connector.Response;
 
-import com.bingsenh.Summer.Cookie.Cookie;
+import com.bingsenh.Summer.cookie.Cookie;
 import com.bingsenh.Summer.connector.enumeration.HttpStatus;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,7 +50,7 @@ public class Response {
         }
         if(cookies!=null&&cookies.size()>0){
             for(Cookie cookie:cookies){
-                headerAppender.append("Set-Cookie:").append(BLANK).append(cookie.getKey()).append("=").append(cookie.getValue()).append(CRLF);
+                headerAppender.append("Set-cookie:").append(BLANK).append(cookie.getKey()).append("=").append(cookie.getValue()).append(CRLF);
 
             }
         }
@@ -59,8 +59,6 @@ public class Response {
 
     public ByteBuffer getResponse(){
         buildHeader();
-//        byte[] header = this.headerAppender.toString().getBytes(UTF_8_CHARSET);
-//        ByteBuffer[] response = {ByteBuffer.wrap(header),ByteBuffer.wrap(body)};
         byte[] header = this.headerAppender.toString().getBytes(UTF_8_CHARSET);
         byte[] response = new byte[header.length + body.length];
         System.arraycopy(header, 0, response, 0, header.length);

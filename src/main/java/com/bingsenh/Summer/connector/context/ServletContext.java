@@ -1,14 +1,18 @@
 package com.bingsenh.Summer.connector.context;
 
+import com.bingsenh.Summer.connector.Response.Response;
 import com.bingsenh.Summer.connector.context.holder.ServletHolder;
+import com.bingsenh.Summer.cookie.Cookie;
 import com.bingsenh.Summer.exception.ServletException;
 import com.bingsenh.Summer.servlet.Servlet;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.bingsenh.Summer.session.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -23,6 +27,8 @@ public class ServletContext {
      * servlet
      * 别名-> 类名
      * URL Pattern -> 别名
+     * 一个Servlet类只能有一个Servlet别名，一个Servlet别名只能对应一个Servlet类
+     * 一个Servlet可以对应多个URL，一个URL只能对应一个Servlet
      */
     private Map<String, ServletHolder> servlsts;
     private Map<String,String> servlstMapping;
@@ -31,6 +37,8 @@ public class ServletContext {
      * Context域
      */
     private Map<String,Object> attributes;
+
+    private Map<String,HttpSession> sessions;
 
     public ServletContext(){
         init();
@@ -68,28 +76,34 @@ public class ServletContext {
         }
 
         if(servletHolder.getServlet() == null){
-            try {
-                Servlet servlet = (Servlet) Class.forName(servletHolder.getServletClass()).newInstance();
-                servlet.init();
-                servletHolder.setServlet(servlet);
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+            synchronized (ServletContext.class) {
+                if(servletHolder.getServlet()==null) {
+                    try {
+                        Servlet servlet = (Servlet) Class.forName(servletHolder.getServletClass()).newInstance();
+                        servlet.init();
+                        servletHolder.setServlet(servlet);
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
         return servletHolder.getServlet();
     }
 
     public Servlet mapServlet(String url) throws ServletException {
+
         //精准匹配，暂时不考虑路径匹配
         String servletAlias = servlstMapping.get(url);
         if(servletAlias!=null){
             log.info("别名:"+servletAlias);
             return initServletInstance(servletAlias);
         }
+
         return initServletInstance(DEFAULT_SERVLET);
     }
 
@@ -126,6 +140,27 @@ public class ServletContext {
             }
 
         }
+    }
+
+
+    /**
+     * Session
+     */
+
+    /**
+     * 创建session
+     * @param response
+     * @return
+     */
+    public HttpSession createSession(Response response){
+        HttpSession httpSession = new HttpSession(UUID.randomUUID().toString());
+        sessions.put(httpSession.getSessionId(),httpSession);
+        response.addCookie(new Cookie("JSESSIONID",httpSession.getSessionId()));
+        return httpSession;
+    }
+
+    public HttpSession getSession(String key){
+        return sessions.get(key);
     }
 
     public Object getAttrubite(String key){

@@ -1,9 +1,10 @@
 package com.bingsenh.Summer.connector.Request;
 
-import com.bingsenh.Summer.Cookie.Cookie;
+import com.bingsenh.Summer.cookie.Cookie;
 import com.bingsenh.Summer.connector.context.ServletContext;
 import com.bingsenh.Summer.connector.enumeration.RequestMethod;
 import com.bingsenh.Summer.exception.ServletException;;
+import com.bingsenh.Summer.session.HttpSession;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,11 +23,14 @@ public class Request {
     private Map<String,Object> attributes;
     private ServletContext servletContext;
     private Cookie[] cookies;
+    private HttpSession session;
 
     public Request(byte[] data) throws ServletException {
         this.attributes = new HashMap<>();
         this.params = new HashMap<>();
         this.headers = new HashMap<>();
+
+        //获取 http 信息并解析
         String[] messages = null;
         try {
             messages = URLDecoder.decode(new String(data, Charset.forName("UTF-8")),"UTF-8").split("\r\n");
@@ -79,8 +83,9 @@ public class Request {
                 headers.put(key,value);
             }
         }
+
         //解析cookie
-        if(headers.containsKey("Cookie")){
+        if(headers.containsKey("cookie")){
             String[] rawCookies = headers.get("Cookies").split("; ");
             this.cookies = new Cookie[rawCookies.length];
             for(int i=0;i<rawCookies.length;i++){
@@ -88,7 +93,7 @@ public class Request {
                 this.cookies[i] = new Cookie(kv[0],kv[1]);
 
             }
-            headers.remove("Cookie");
+            headers.remove("cookie");
         }else {
             this.cookies = new Cookie[0];
         }
@@ -105,6 +110,35 @@ public class Request {
         }else {
             parseParams(body.trim());
         }
+    }
+
+
+    //从cookie 中获取 JSESSIONID,根据 JSESSIONID 获取相应 session
+    // cookie 若无 JSESSIONID 则创建一个,并在响应头中设置 Set-Cookie：“JSESSIONID=XXXXXXX”
+    public HttpSession getSession(boolean createIfNotExists){
+        if(session!=null){
+            return session;
+        }
+
+        for(Cookie cookie:cookies){
+            if(cookie.getKey().equals("JSESSIONID")){
+                HttpSession currentSession = servletContext.getSession(cookie.getValue());
+                if(currentSession!=null){
+                    return session;
+                }
+            }
+        }
+
+        if(!createIfNotExists){
+            return null;
+        }
+
+        //session = servletContext.createSession(requestHandler.getResponse());
+        return session;
+    }
+
+    public HttpSession getSession(){
+        return getSession(true);
     }
 
     //解析请求参数
