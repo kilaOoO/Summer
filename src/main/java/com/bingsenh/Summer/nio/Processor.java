@@ -28,7 +28,6 @@ public class Processor {
     public Processor(SocketWrapper socketWrapper){
             this.socketWrapper =socketWrapper;
             this.sk = socketWrapper.getSk();
-            this.sk = sk;
             this.sc = (SocketChannel) sk.channel();
             pool.setCorePoolSize(32);
     }

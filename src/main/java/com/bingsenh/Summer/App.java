@@ -31,18 +31,5 @@ public class App
                 httpServer.closeServer();
             }
         }
-//
-//        System.out.println(App.class.getResource(""));
-//        System.out.println(App.class.getResource("/"));
-
-//        SAXReader reader = new SAXReader();
-//        Document doc = null;
-//
-//        try {
-//            doc = reader.read(App.class.getResourceAsStream("/web.xml"));
-//        } catch (DocumentException e) {
-//            System.out.println("加载失败");
-//            e.printStackTrace();
-//        }
     }
 }

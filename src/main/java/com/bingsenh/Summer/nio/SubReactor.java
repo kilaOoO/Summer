@@ -24,26 +24,26 @@ public class SubReactor implements Runnable {
     public void run() {
         log.info("the subReactor is running....");
         while (!Thread.interrupted()){
-            if(!restart){
+            if(!restart) {
                 try {
-                    if(selector.select() <= 0){
+                    if (selector.select() <= 0) {
                         continue;
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
 
-            Set<SelectionKey> keys = selector.selectedKeys();
-            Iterator<SelectionKey> iterator = keys.iterator();
-            while(iterator.hasNext()){
-                SelectionKey key = iterator.next();
-                iterator.remove();
-                Processor processor = (Processor) key.attachment();
-                try {
-                    processor.dispatch();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                Set<SelectionKey> keys = selector.selectedKeys();
+                Iterator<SelectionKey> iterator = keys.iterator();
+                while (iterator.hasNext()) {
+                    SelectionKey key = iterator.next();
+                    iterator.remove();
+                    Processor processor = (Processor) key.attachment();
+                    try {
+                        processor.dispatch();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
