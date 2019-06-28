@@ -34,8 +34,9 @@ public class Worker implements Runnable{
     public void run() {
         try {
             //构建request && response
-            request = new Request(byteBuffer.array());
             response = new Response();
+            request = new Request(byteBuffer.array());
+            request.setResponse(response);
             servlet = servletContext.mapServlet(request.getUrl());
             //执行业务逻辑
             service();

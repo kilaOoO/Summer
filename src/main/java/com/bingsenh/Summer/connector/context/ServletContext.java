@@ -1,18 +1,21 @@
 package com.bingsenh.Summer.connector.context;
 
 import com.bingsenh.Summer.connector.Response.Response;
+import com.bingsenh.Summer.connector.context.holder.FilterHolder;
 import com.bingsenh.Summer.connector.context.holder.ServletHolder;
 import com.bingsenh.Summer.cookie.Cookie;
+import com.bingsenh.Summer.exception.NotFoundException;
 import com.bingsenh.Summer.exception.ServletException;
+import com.bingsenh.Summer.filter.Filter;
 import com.bingsenh.Summer.servlet.Servlet;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.bingsenh.Summer.session.HttpSession;
+import com.bingsenh.Summer.session.SessionCleaner;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -30,15 +33,28 @@ public class ServletContext {
      * 一个Servlet类只能有一个Servlet别名，一个Servlet别名只能对应一个Servlet类
      * 一个Servlet可以对应多个URL，一个URL只能对应一个Servlet
      */
+
     private Map<String, ServletHolder> servlsts;
     private Map<String,String> servlstMapping;
 
     /**
-     * Context域
+     * filter
+     * 别名-> 类名
+     * URL Pattern -> 别名
+     * 一个 URL Pattern 能对应多个 filter
+     */
+
+    private Map<String, FilterHolder> filters;
+    private Map<String,List<String>> filterMapping;
+
+    /**
+     * context 域
      */
     private Map<String,Object> attributes;
 
     private Map<String,HttpSession> sessions;
+
+    private SessionCleaner sessionCleaner;
 
     public ServletContext(){
         init();
@@ -51,6 +67,9 @@ public class ServletContext {
         this.servlsts = new HashMap<>();
         this.servlstMapping = new HashMap<>();
         this.attributes = new ConcurrentHashMap<>();
+        this.sessions = new ConcurrentHashMap<>();
+        this.sessionCleaner = new SessionCleaner();
+        sessionCleaner.start();
         parseXml();
     }
 
@@ -108,6 +127,36 @@ public class ServletContext {
     }
 
     /**
+     * 根据路由获取filter实例
+     */
+
+    private Filter initFilterInstance(String filterAlias) throws NotFoundException {
+        FilterHolder filterHolder = filters.get(filterAlias);
+        if(filterHolder == null){
+            throw new NotFoundException();
+        }
+
+        if(filterHolder.getFilter() == null){
+            try {
+                Filter filter = (Filter) Class.forName(filterHolder.getFilterClass()).newInstance();
+                filter.init();
+                filterHolder.setFilter(filter);
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return filterHolder.getFilter();
+    }
+
+
+  ''
+
+    /**
      * web.xml解析
      */
     private void parseXml(){
@@ -148,7 +197,7 @@ public class ServletContext {
      */
 
     /**
-     * 创建session
+     * 创建 session
      * @param response
      * @return
      */
@@ -158,6 +207,28 @@ public class ServletContext {
         response.addCookie(new Cookie("JSESSIONID",httpSession.getSessionId()));
         return httpSession;
     }
+
+    /**
+     * 销毁 session
+     * @param session
+     */
+    public void invalidateSession(HttpSession session){
+        sessions.remove(session.getSessionId());
+    }
+
+    /**
+     * 清除过期的 session
+     */
+    public void cleanSessions(){
+        for(Iterator<Map.Entry<String,HttpSession>> it = sessions.entrySet().iterator();it.hasNext();){
+            Map.Entry<String,HttpSession> entry = it.next();
+            if(Duration.between(entry.getValue().getLastAccessed(), Instant.now()).getSeconds()>=300){
+                it.remove();
+            }
+        }
+    }
+
+
 
     public HttpSession getSession(String key){
         return sessions.get(key);

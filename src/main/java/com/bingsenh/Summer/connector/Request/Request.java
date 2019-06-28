@@ -1,5 +1,6 @@
 package com.bingsenh.Summer.connector.Request;
 
+import com.bingsenh.Summer.connector.Response.Response;
 import com.bingsenh.Summer.cookie.Cookie;
 import com.bingsenh.Summer.connector.context.ServletContext;
 import com.bingsenh.Summer.connector.enumeration.RequestMethod;
@@ -24,6 +25,7 @@ public class Request {
     private ServletContext servletContext;
     private Cookie[] cookies;
     private HttpSession session;
+    private Response response;
 
     public Request(byte[] data) throws ServletException {
         this.attributes = new HashMap<>();
@@ -112,9 +114,13 @@ public class Request {
         }
     }
 
+    /**
+     * 从cookie 中获取 JSESSIONID,根据 JSESSIONID 获取相应 session
+     * cookie 若无 JSESSIONID 则创建一个,并在响应头中设置 Set-Cookie：“JSESSIONID=XXXXXXX”
+     * @param createIfNotExists
+     * @return
+     */
 
-    //从cookie 中获取 JSESSIONID,根据 JSESSIONID 获取相应 session
-    // cookie 若无 JSESSIONID 则创建一个,并在响应头中设置 Set-Cookie：“JSESSIONID=XXXXXXX”
     public HttpSession getSession(boolean createIfNotExists){
         if(session!=null){
             return session;
@@ -133,7 +139,7 @@ public class Request {
             return null;
         }
 
-        //session = servletContext.createSession(requestHandler.getResponse());
+        session = servletContext.createSession(response);
         return session;
     }
 

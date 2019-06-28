@@ -29,7 +29,7 @@ public class HttpSession {
     public void Invalidate(){
         this.isVaild = false;
         this.attributes.clear();
-        //WebApplication.getServletContext().invalidateSession(this);
+        WebApplication.getServletContext().invalidateSession(this);
     }
 
     public Object getAtrribute(String key){
