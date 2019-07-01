@@ -66,6 +66,8 @@ public class ServletContext {
     private void init(){
         this.servlsts = new HashMap<>();
         this.servlstMapping = new HashMap<>();
+        this.filters = new HashMap<>();
+        this.filterMapping = new HashMap<>();
         this.attributes = new ConcurrentHashMap<>();
         this.sessions = new ConcurrentHashMap<>();
         this.sessionCleaner = new SessionCleaner();
@@ -130,6 +132,17 @@ public class ServletContext {
      * 根据路由获取filter实例
      */
 
+    public List<Filter> mapFilter(String url) throws NotFoundException {
+        List<Filter> result = new ArrayList<>();
+        List<String> filterAlias = filterMapping.get(url);
+        if(filterAlias!=null){
+            for(String alias : filterAlias){
+                result.add(initFilterInstance(alias));
+            }
+        }
+        return result;
+    }
+
     private Filter initFilterInstance(String filterAlias) throws NotFoundException {
         FilterHolder filterHolder = filters.get(filterAlias);
         if(filterHolder == null){
@@ -154,7 +167,7 @@ public class ServletContext {
     }
 
 
-  ''
+
 
     /**
      * web.xml解析
@@ -169,8 +182,8 @@ public class ServletContext {
             System.out.println("加载失败");
             e.printStackTrace();
         }
-
         Element root = doc.getRootElement();
+
         //解析servlet
         List<Element> servlets = root.elements("servlet");
         for(Element servletEle:servlets){
@@ -188,6 +201,29 @@ public class ServletContext {
                 this.servlstMapping.put(key,value);
             }
 
+        }
+
+
+        //解析 filter
+        List<Element> filters = root.elements("filter");
+        for(Element filterEle:filters){
+            String key = filterEle.element("filter-name").getText();
+            String value  = filterEle.element("filter-class").getText();
+            this.filters.put(key,new FilterHolder(value));
+        }
+
+        List<Element> filterMappings = root.elements("filter-mapping");
+        for(Element mapping:filterMappings){
+            List<Element> urlPatterns = mapping.elements("url-pattern");
+            String value = mapping.element("filter-name").getText();
+            for(Element urlPattern:urlPatterns){
+                List<String> values = this.filterMapping.get(urlPattern.getText());
+                if(values == null){
+                    values = new ArrayList<>();
+                    this.filterMapping.put(urlPattern.getText(),values);
+                }
+                values.add(value);
+            }
         }
     }
 
