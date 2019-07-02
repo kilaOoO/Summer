@@ -11,11 +11,11 @@
 - web.xml parse
 - cookie
 - nio
+- session
+- filter
 
 ## 待完成功能
 
-- session
-- filter
 - listener
 - Static Resources & File Download
 - 长连接
