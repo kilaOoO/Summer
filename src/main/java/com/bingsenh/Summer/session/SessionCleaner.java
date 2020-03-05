@@ -1,6 +1,6 @@
 package com.bingsenh.Summer.session;
 
-import com.bingsenh.Summer.connector.context.WebApplication;
+import com.bingsenh.Summer.container.context.WebApplication;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.Executors;
@@ -33,8 +33,8 @@ public class SessionCleaner implements Runnable{
 
     @Override
     public void run() {
-        log.info("开始扫描过期的 session...");
+        //log.info("开始扫描过期的 session...");
         WebApplication.getServletContext().cleanSessions();
-        log.info("扫描结束...");
+        //log.info("扫描结束...");
     }
 }
