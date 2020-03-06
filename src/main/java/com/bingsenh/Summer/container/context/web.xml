@@ -2,13 +2,38 @@
 <web-app>
 
     <servlet>
-        <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>sample.LoginServlet</servlet-class>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>sample.LoginServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>RedirectServlet</servlet-name>
+        <servlet-class>sample.RedirectServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>RedirectServlet</servlet-name>
+        <url-pattern>/redirect</url-pattern>
+    </servlet-mapping>
+
+
+    <!--Filter-->
+
+    <filter>
+        <filter-name>LogFilter</filter-name>
+        <filter-class>sample.LogFilter</filter-class>
+    </filter>
+
+
+
+    <filter-mapping>
+        <filter-name>LogFilter</filter-name>
+        <url-pattern>/login</url-pattern>
+    </filter-mapping>
 
 </web-app>

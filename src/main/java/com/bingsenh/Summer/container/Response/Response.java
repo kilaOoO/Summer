@@ -15,11 +15,13 @@ public class Response {
     private final static String BLANK = " ";
     private final static String CRLF = "\r\n";
     private final static Charset UTF_8_CHARSET = Charset.forName("UTF-8");
+    public static final String DEFAULT_CONTENT_TYPE = "text/html;charset=utf-8";
 
     private StringBuilder headerAppender;
     private List<Cookie> cookies;
     private List<Header> headers;
     private HttpStatus status = HttpStatus.OK;
+    private String contentType = DEFAULT_CONTENT_TYPE;
     private byte[] body = new byte[0];
 
     public Response(){
@@ -29,6 +31,9 @@ public class Response {
     }
 
     public void setStatus(HttpStatus status){this.status =status;}
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
     public void setBody(byte[] body){this.body = body;}
     public void addCookie(Cookie cookie){cookies.add(cookie);}
     public void addHeader(Header header){headers.add(header);}
@@ -42,7 +47,7 @@ public class Response {
         headerAppender.append("HTTP/1.1").append(BLANK).append(status.getCode()).append(BLANK).append(status).append(CRLF);
         //响应头
         headerAppender.append("Date:").append(BLANK).append(new Date()).append(CRLF);
-        headerAppender.append("Content-Type:").append(BLANK).append("text/html;charset=utf-8").append(CRLF);
+        headerAppender.append("Content-Type:").append(BLANK).append(contentType).append(CRLF);
         if(headers!=null&&headers.size()>0){
             for(Header header:headers){
                 headerAppender.append(header.getKey()).append(":").append(BLANK).append(header.getValue()).append(CRLF);
@@ -75,6 +80,16 @@ public class Response {
         System.arraycopy(header, 0, response, 0, header.length);
         System.arraycopy(body, 0, response, header.length, body.length);
         return response;
+    }
+
+    /**
+     * 请求重定向
+     * @param url
+     */
+    public void sendRedirect(String url){
+        log.info("重定向至 {}",url);
+        addHeader(new Header("Location",url));
+        setStatus(HttpStatus.REDIRECT);
     }
 
 

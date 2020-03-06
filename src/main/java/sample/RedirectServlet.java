@@ -13,27 +13,20 @@ import java.util.Map;
  * @Date 2019/6/2
  */
 @Slf4j
-public class LoginServlet extends HttpServlet {
+public class RedirectServlet extends HttpServlet {
     @Override
     public void init() {
-        log.info("LoginServlet init...");
+        log.info("RedirectServlet init...");
     }
 
     @Override
     public void destory() {
-        log.info("LoginServlet destroy");
+        log.info("Redirectervlet destroy");
     }
 
     @Override
     public void doGet(Request request, Response response) {
-        Map<String,String> params = request.getParams();
-        String username = params.get("username");
-        String password = params.get("password");
-        System.out.println(username);
-        System.out.println(password);
-        if(!password.equals("12345")){
-            response.sendRedirect("redirect");
-        }else {
+
             String message = "<!DOCTYPE html>\n" +
                     "<html>\n" +
                     "<head>\n" +
@@ -41,12 +34,12 @@ public class LoginServlet extends HttpServlet {
                     "<title>菜鸟教程(runoob.com)</title>\n" +
                     "</head>\n" +
                     "<body>\n" +
-                    "    <p>hello</p>\n" +
+                    "    <p>Redirect success</p>\n" +
                     "</body>\n" +
                     "</html>";
 
             response.setStatus(HttpStatus.OK);
             response.setBody(message.getBytes());
-        }
+
     }
 }

@@ -1,5 +1,8 @@
 package com.bingsenh.Summer.connector.nio;
 
+import com.bingsenh.Summer.exception.NotFoundException;
+import com.bingsenh.Summer.exception.ServletException;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
@@ -89,7 +92,9 @@ public class NioServerWorker extends AbstractNioSelector implements Worker {
             selectionKey.cancel();
             System.out.println("客户端断开连接");
         }else {
+
             pool.execute(new Processor(buffer,selectionKey));
+
         }
 
     }
